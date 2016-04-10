@@ -1,0 +1,25 @@
+{
+  "name": "gulf-socialcalc",
+  "version": "0.1.0",
+  "description": "Gulf wrapper for the socialcalc spreadsheet editor",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marcelklehr/gulf-socialcalc.git"
+  },
+  "keywords": [
+    "ot",
+    "gulf",
+    "socialcalc",
+    "spreadsheet"
+  ],
+  "author": "Marcel Klehr <mklehr@gmx.net>",
+  "license": "MPL-2.0",
+  "bugs": {
+    "url": "https://github.com/marcelklehr/gulf-socialcalc/issues"
+  },
+  "homepage": "https://github.com/marcelklehr/gulf-socialcalc#readme"
+}
