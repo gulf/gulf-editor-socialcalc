@@ -3,6 +3,13 @@
   "version": "0.1.0",
   "description": "Gulf wrapper for the socialcalc spreadsheet editor",
   "main": "index.js",
+  "peerDependencies": {
+    "gulf": "4.x",
+    "socialcalc": "2.x"
+  },
+  "dependencies": {
+    "ot-socialcalc": "0.x"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
