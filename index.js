@@ -33,11 +33,30 @@ module.exports = function(socialCalcControl) {
   }
 
   doc._change = function(changes, cb) {
+    var editor = socialCalcControl.editor
+    
+    // Remember old selection
+    var oldSel = editor.range.hasrange && SocialCalc.crToCoord(editor.range.left, editor.range.top)+
+                      ":"+SocialCalc.crToCoord(editor.range.right, editor.range.bottom)
+      , oldECell = editor.ecell.coord
+    
+    // Apply changes
     var cmds = spreadsheetOT.serializeEdit(changes)
     socialCalcControl.sheet.ScheduleSheetCommands(cmds, /*saveundo:*/false, /*isRemote:*/true)
     socialCalcControl.editor.StatusCallback['gulf-socialcalc#_onchange'] = { func: (editor, status) => {
       if('cmdend' !== status) return
       delete socialCalcControl.editor.StatusCallback['gulf-socialcalc#_onchange']
+      // commands exectuted!
+
+      // Restore transformed selection
+      var newECell = spreadsheetOT.transformCursor(oldECell, changes)
+      editor.MoveECell(newECell)
+      
+      var newSel = spreadsheetOT.transformCursor(oldSel, changes)
+        , newSelSplit = newSel.split(':')
+      editor.RangeAnchor(newSelSplit[0])
+      editor.RangeExtend(newSelSplit[1])
+      
       cb()
     } }
   }
