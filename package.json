@@ -1,6 +1,6 @@
 {
   "name": "gulf-socialcalc",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Gulf wrapper for the socialcalc spreadsheet editor",
   "main": "index.js",
   "peerDependencies": {
