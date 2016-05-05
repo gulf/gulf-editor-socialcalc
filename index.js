@@ -43,7 +43,7 @@ module.exports = function(socialCalcControl) {
     // Apply changes
     var cmds = spreadsheetOT.serializeEdit(changes)
     socialCalcControl.sheet.ScheduleSheetCommands(cmds, /*saveundo:*/false, /*isRemote:*/true)
-    socialCalcControl.editor.StatusCallback['gulf-socialcalc#_onchange'] = { func: (editor, status) => {
+    socialCalcControl.editor.StatusCallback['gulf-socialcalc#_onchange'] = { func: function(editor, status) {
       if('cmdend' !== status) return
       delete socialCalcControl.editor.StatusCallback['gulf-socialcalc#_onchange']
       // commands exectuted!
