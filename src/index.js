@@ -16,23 +16,35 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 var gulf = require('gulf')
-  , spreadsheetOT = require('ot-socialcalc')
   , SocialCalc = require('socialcalc')
 
 require('./socialcalc_patches')
 
-module.exports = function(socialCalcControl) {
-  var doc = new gulf.EditableDocument(new gulf.MemoryAdapter, spreadsheetOT)
+class SocialcalcDocument extends gulf.EditableDocument {
+  constructor(opts) {
+    super(opts)
+    if (!opts.editorInstance) throw new Error('No SocialCalc instance was passed')
+    this.socialcalcControl = opts.editorInstance
 
-  doc.socialCalcControl = socialCalcControl
-
-  doc._setContents = function(newcontent, cb) {
-    socialCalcControl.sheet.ParseSheetSave(newcontent)
-    socialCalcControl.sheet.ScheduleSheetCommands('recalc', /*saveundo:*/false, /*isRemote:*/false)
-    cb()
+    SocialCalc.Callbacks.broadcast = (type, data) => {
+      if('execute' !== type) return
+      var changes = this.ottype.deserializeEdit(data.cmdstr)
+      this.submitChange(changes)
+    }
   }
 
-  doc._change = function(changes, cb) {
+  close() {
+    super.close()
+    SocialCalc.Callbacks.broadcast = () => {}
+  }
+  
+  _setContent(newcontent) {
+    socialCalcControl.sheet.ParseSheetSave(newcontent)
+    socialCalcControl.sheet.ScheduleSheetCommands('recalc', /*saveundo:*/false, /*isRemote:*/false)
+    return Promise.resolve()
+  }
+
+  _onChange(changes) {
     var editor = socialCalcControl.editor
     
     // Remember old selection
@@ -41,36 +53,37 @@ module.exports = function(socialCalcControl) {
       , oldECell = editor.ecell.coord
     
     // Apply changes
-    var cmds = spreadsheetOT.serializeEdit(changes)
+    var cmds = this.ottype.serializeEdit(changes)
+      , cb
+      , promise = new Promise((resolve) => cb = resolve)
+    
     socialCalcControl.sheet.ScheduleSheetCommands(cmds, /*saveundo:*/false, /*isRemote:*/true)
-    socialCalcControl.editor.StatusCallback['gulf-socialcalc#_onchange'] = { func: function(editor, status) {
-      if('cmdend' !== status) return
-      delete socialCalcControl.editor.StatusCallback['gulf-socialcalc#_onchange']
-      // commands exectuted!
+    socialCalcControl.editor.StatusCallback['gulf-editor-socialcalc#_onChange'] = {
+      func: (editor, status) => {
+        if('cmdend' !== status) return
+        delete socialCalcControl.editor.StatusCallback['gulf-editor-socialcalc#_onChange']
+        // commands exectuted! 
+        cb()
+      }
+    }
 
-      // Restore transformed selection
-      var newECell = spreadsheetOT.transformCursor(oldECell, changes)
-      editor.MoveECell(newECell)
-      
-      var newSel = spreadsheetOT.transformCursor(oldSel, changes)
-        , newSelSplit = newSel.split(':')
-      editor.RangeAnchor(newSelSplit[0])
-      editor.RangeExtend(newSelSplit[1])
-      
-      cb()
-    } }
+    return promise
+    .then(() => {
+        // Restore transformed selection
+        var newECell = this.ottype.transformCursor(oldECell, changes)
+        editor.MoveECell(newECell)
+        
+        var newSel = this.ottype.transformCursor(oldSel, changes)
+          , newSelSplit = newSel.split(':')
+        editor.RangeAnchor(newSelSplit[0])
+        editor.RangeExtend(newSelSplit[1])
+    })
   }
 
-  doc._collectChanges = function(cb) {
+  _onBeforeChange() {
     // changes are automatically collected
-    cb()
+    return Promise.resolve()
   }
-
-  SocialCalc.Callbacks.broadcast = function(type, data) {
-    if('execute' !== type) return
-    var changes = spreadsheetOT.deserializeEdit(data.cmdstr)
-    doc.update(changes)
-  }
-
-  return doc
 }
+
+module.exports = SocialcalcDocument
