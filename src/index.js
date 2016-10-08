@@ -16,12 +16,14 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 var gulf = require('gulf')
+  , socialcalcOT = require('ot-socialcalc')
   , SocialCalc = require('socialcalc')
 
 require('./socialcalc_patches')
 
 class SocialcalcDocument extends gulf.EditableDocument {
   constructor(opts) {
+    opts.ottype = opts.ottype || socialcalcOT
     super(opts)
     if (!opts.editorInstance) throw new Error('No SocialCalc instance was passed')
     this.socialcalcControl = opts.editorInstance
