@@ -1,6 +1,6 @@
 {
   "name": "gulf-editor-socialcalc",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Gulf bindings for the socialcalc spreadsheet editor",
   "dependencies": {
     "gulf": "5.x",
@@ -19,7 +19,9 @@
     "presets": [
       "es2015"
     ],
-    "plugins": ["transform-runtime"]
+    "plugins": [
+      "transform-runtime"
+    ]
   },
   "devDependencies": {
     "babel-cli": "6.x",
