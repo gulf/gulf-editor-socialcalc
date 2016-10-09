@@ -7,7 +7,7 @@ It utilizes the [ot-socialcalc](https://github.com/marcelklehr/ot-socialcalc) OT
 ## Install
 
 ```
-npm install --save gulf-editor-codemirror
+npm install --save gulf-editor-socialcalc
 ```
 
 ## Usage
