@@ -1,6 +1,6 @@
 {
   "name": "gulf-editor-socialcalc",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Gulf bindings for the socialcalc spreadsheet editor",
   "dependencies": {
     "gulf": "5.x",
